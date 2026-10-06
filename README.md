@@ -1,9 +1,27 @@
 # MyWhoosh2Garmin
 
+<!--toc:start-->
+- [MyWhoosh2Garmin](#mywhoosh2garmin)
+  - [Why?](#why)
+  - [Download](#download)
+  - [How to Use](#how-to-use)
+    - [1. Enter MyWhoosh credentials](#1-enter-mywhoosh-credentials)
+    - [2. Enter Garmin credentials](#2-enter-garmin-credentials)
+    - [3. Fetch Activities](#3-fetch-activities)
+    - [4. Upload to Garmin](#4-upload-to-garmin)
+  - [Building from Source](#building-from-source)
+    - [Prerequisites](#prerequisites)
+    - [Build](#build)
+    - [Run tests](#run-tests)
+  - [How It Works](#how-it-works)
+  - [Features Ideas](#features-ideas)
+  - [Credits](#credits)
+  - [License](#license)
+<!--toc:end-->
+
 A single-executable GUI app that syncs your [MyWhoosh](https://www.mywhoosh.com/) indoor cycling activities to [Garmin Connect](https://connect.garmin.com/) — with full training effect, VO2max, and performance stats support.
 
 No need to run this on the same PC as MyWhoosh — the app downloads activities directly from your MyWhoosh account.
-
 
 ## Why?
 
@@ -15,11 +33,11 @@ MyWhoosh exports FIT files, but they have issues that prevent Garmin from fully 
 
 MyWhoosh2Garmin fixes all of this automatically:
 
-| Problem | Fix |
-|---|---|
-| Missing avg power / HR / cadence | Calculated from ride records |
-| Fake temperature data | Stripped from all records |
-| MyWhoosh device identity | Spoofed to Garmin Fenix 6S Pro |
+| Problem                          | Fix                            |
+| -------------------------------- | ------------------------------ |
+| Missing avg power / HR / cadence | Calculated from ride records   |
+| Fake temperature data            | Stripped from all records      |
+| MyWhoosh device identity         | Spoofed to Garmin Fenix 6S Pro |
 
 The result: your indoor rides show up on Garmin Connect just like a native Garmin recording, complete with **Training Effect**, **VO2max updates**, **Training Load**, and **Training Status**.
 
@@ -27,10 +45,10 @@ The result: your indoor rides show up on Garmin Connect just like a native Garmi
 
 Grab the latest release for your platform from the [**Releases**](../../releases) page:
 
-| Platform | File |
-|---|---|
-| Windows | `mywhoosh2garmin-windows-amd64.exe` |
-| Linux | `mywhoosh2garmin-linux-amd64` |
+| Platform | File                                |
+| -------- | ----------------------------------- |
+| Windows  | `mywhoosh2garmin-windows-amd64.exe` |
+| Linux    | `mywhoosh2garmin-linux-amd64`       |
 
 No installation needed — just download and run.
 
@@ -97,35 +115,41 @@ go test ./...
 
 ## How It Works
 
+```text
+┌─────────────────────┐
+│  MyWhoosh Web API   │
+│  Login + List       │
+│  Download FIT file  │
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  Decode FIT (V2)    │
+│  Fix session avgs   │
+│  Strip temperature  │
+│  Spoof Device       │
+│  Encode FIT (V2)    │
+└─────────┬───────────┘
+          │
+          ▼
+┌─────────────────────┐
+│  Garmin SSO Login   │
+│  OAuth1 → OAuth2    │
+│  Upload FIT file    │
+└─────────────────────┘
+          │
+          ▼
+   Garmin Connect
+(Training Effect ✓)
+(VO2max ✓)
+(Training Load ✓)
 ```
-  ┌─────────────────────┐
-  │  MyWhoosh Web API   │
-  │  Login + List       │
-  │  Download FIT file  │
-  └─────────┬───────────┘
-            │
-            ▼
-  ┌─────────────────────┐
-  │  Decode FIT (V2)    │
-  │  Fix session avgs   │
-  │  Strip temperature  │
-  │  Spoof → Fenix 6S   │
-  │  Encode FIT (V2)    │
-  └─────────┬───────────┘
-            │
-            ▼
-  ┌─────────────────────┐
-  │  Garmin SSO Login   │
-  │  OAuth1 → OAuth2    │
-  │  Upload FIT file    │
-  └─────────────────────┘
-            │
-            ▼
-     Garmin Connect
-  (Training Effect ✓)
-  (VO2max ✓)
-  (Training Load ✓)
-```
+
+## Features Ideas
+
+- Improve plug-n-play setup
+  - Auto upload to garmin when a new fit file is detected
+  - Add a toggle button to auto-launch MyWhoosh when MyWhoosh2Garmin started.
 
 ## Credits
 
