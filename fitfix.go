@@ -27,9 +27,9 @@ const (
 
 // Device spoofing constants.
 const (
-	garminManufacturer = typedef.ManufacturerGarmin   // 1
-	fenix6sProduct     = typedef.GarminProductFenix6s // 3288
-	fakeSerialNumber   = uint32(3420897194)
+	garminManufacturer = typedef.ManufacturerGarmin // 1
+	garminProductId    = typedef.GarminProductEdge540
+	fakeSerialNumber   = uint32(112741)
 )
 
 // logFn can be overridden to redirect log output (e.g., to a GUI).
@@ -143,7 +143,8 @@ func fixFitFile(inputPath, outputPath string) error {
 	lis := filedef.NewListener()
 	defer lis.Close()
 
-	dec := decoder.New(f,
+	dec := decoder.New(
+		f,
 		decoder.WithMesgListener(lis),
 		decoder.WithBroadcastOnly(),
 	)
@@ -234,16 +235,16 @@ func avgU8(vals []uint8) uint8 {
 
 func spoofDevice(activity *filedef.Activity) {
 	activity.FileId.Manufacturer = garminManufacturer
-	activity.FileId.Product = fenix6sProduct.Uint16()
+	activity.FileId.Product = garminProductId.Uint16()
 	activity.FileId.SerialNumber = fakeSerialNumber
 
 	for _, di := range activity.DeviceInfos {
 		di.Manufacturer = garminManufacturer
-		di.Product = fenix6sProduct.Uint16()
+		di.Product = garminProductId.Uint16()
 		di.SerialNumber = fakeSerialNumber
 	}
 
-	logFn("  → device spoofed: Garmin Fenix 6S Pro (product %d)\n", fenix6sProduct)
+	logFn("  → Garmin device spoofed. Product %d; S/N %d\n", garminProductId, fakeSerialNumber)
 }
 
 // ---------------------------------------------------------------------------
